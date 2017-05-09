@@ -1,0 +1,191 @@
+<?php
+session_start();
+require_once 'dbconnect.php';
+
+if (isset($_SESSION['userSession'])!="") {
+	header("Location: index.php");
+}
+
+if (isset($_POST['btn-login'])) {
+	
+	$email = strip_tags($_POST['email']);
+	$password = strip_tags($_POST['password']);
+	
+	$email = $DBcon->real_escape_string($email);
+	$password = $DBcon->real_escape_string($password);
+
+    // username,fname,lname,email,password,pic_profile
+	$query = $DBcon->query("SELECT username, email, password FROM web WHERE email='$email'");
+	$row=$query->fetch_array();
+	$count = $query->num_rows; // if email/password are correct returns must be 1 row
+
+    if (password_verify(hash('sha256', $password, true),  $row['password']) && $count==1) {
+        $_SESSION['userSession'] = $row['username'];
+        header("Location: index.php");
+    }
+    else {
+        $msg2 = "<div class='alert alert-danger'>
+					<span class='glyphicon glyphicon-info-sign'></span> &nbsp; Invalid Username or Password !
+				</div>";
+    }
+
+	$DBcon->close();
+}
+
+if(isset($_POST['btn-signup'])) {
+    $fname       = strip_tags($_POST['fname']);
+    $lname       = strip_tags($_POST['lname']);
+    $username    = strip_tags($_POST['username']);
+    $email       = strip_tags($_POST['email']);
+
+
+    $confirmPass = password_hash(hash('sha256', $_POST['confirmpassword'], true), PASSWORD_DEFAULT);
+    $password = password_hash(hash('sha256', $_POST['password'], true), PASSWORD_DEFAULT);
+
+    $fname = $DBcon->real_escape_string($fname);
+    $lname = $DBcon->real_escape_string($lname);
+    $username = $DBcon->real_escape_string($username);
+    $email = $DBcon->real_escape_string($email);
+    $password = $DBcon->real_escape_string($password);
+
+    $check_email = $DBcon->query("SELECT email FROM web WHERE email='$email'");
+    $count=$check_email->num_rows;
+
+    if((strip_tags($_POST['password']))!== (strip_tags($_POST['confirmpassword']))) {
+        $msg = "<div class='alert alert-danger'>
+					<span class='glyphicon glyphicon-info-sign'></span> &nbsp; Your passwords did not match !
+				    </div>";
+        // exit;
+    }
+    elseif ($count==0) {
+        $query = "INSERT INTO web(username,fname,lname,email,password,pic_profile) VALUES('$username','$fname','$lname','$email','$password','default.png')";
+
+        if ($DBcon->query($query)) {
+            if (!file_exists("profile/$username")) {
+                mkdir("profile/$username", 0777, true);
+            }
+
+            copy("profile/default/default.png","profile/$username/default.png");
+            $msg = "<div class='alert alert-success'>
+						<span class='glyphicon glyphicon-info-sign'></span> &nbsp; Successfully registered !
+					</div>";
+            header('Refresh: 1; URL=login.php');
+        }
+        else {$msg = "<div class='alert alert-danger'>
+						<span class='glyphicon glyphicon-info-sign'></span> &nbsp; Error while registering !
+					</div>";
+        }
+    }
+    else {$msg = "<div class='alert alert-danger'>
+					<span class='glyphicon glyphicon-info-sign'></span> &nbsp; Sorry email already taken !
+				    </div>";
+
+    }
+
+    $DBcon->close();
+}
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cyb3r</title>
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="assets/css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="assets/css/login.css" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="signin-form" id="login">
+	<div class="container">
+       <form class="form-signin" method="post" id="login-form">
+        <h2 class="form-signin-heading">Sign In.</h2><hr />
+        <?php
+		if(isset($msg2)){
+			echo $msg2;
+		}
+		?>
+        <div class="form-group">
+            <input type="email" class="form-control" placeholder="insert Email address" name="email" required />
+            <span id="check-e"></span>
+        </div>
+        
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="insert Password" name="password" required />
+        </div>
+     	<hr />
+        
+        <div class="form-group">
+            <a href="#" class="btn btn-default" style="float:left;"  id="btn-register">
+                <span class="glyphicon glyphicon-user"></span>  Sign UP</a>
+            <div class="text-center">
+                <button type="submit" class="btn btn-default" name="btn-login" id="btn-login">
+                    <span class="glyphicon glyphicon-log-in"></span> &nbsp; Sign In
+                </button>
+            </div>
+        </div>
+       </form>
+    </div>
+</div>
+
+<div class="signin-form" id="register" hidden>
+    <div class="container">
+        <form class="form-signin" method="post" id="register-form">
+            <h2 class="form-signin-heading">Sign Up</h2><hr />
+            <?php
+            if (isset($msg)) {
+                echo $msg;
+            }
+            ?>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Insert a Username" name="username" required />
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Insert a First Name" name="fname" required />
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Insert a Last Name" name="lname" required />
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" placeholder="Insert a Email Address" name="email" required />
+                <span id="check-e"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Insert a Password" name="password" required />
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Insert a Confirm Password" name="confirmpassword" required />
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+                <a href="#" class="btn btn-default" style="float:left;" id="loginbtn">
+                    <span class="glyphicon glyphicon-user"></span>   Login
+                </a>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-default" name="btn-signup">
+                        <span class="glyphicon glyphicon-log-in"></span>    Create Account
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $("#btn-register").click(function () {
+        $("#login").fadeOut(500);
+        $("#register").delay(500).fadeIn(500);
+    });
+    $("#loginbtn").click(function () {
+        $("#register").fadeOut(500);
+        $("#login").delay(500).fadeIn(500);
+    });
+</script>
+</body>
+</html>

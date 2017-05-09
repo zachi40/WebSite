@@ -1,0 +1,15 @@
+body{
+    background-image: url("../img/Background.jpg");
+}
+
+.cover{
+    color: rgb(255, 255, 255);
+    position: relative;
+    min-height: 350px;
+    background: url("../img/header.jpg") no-repeat scroll 0px 100% / cover transparent;
+}
+
+.well{
+    background-color: #ffffff;
+
+}

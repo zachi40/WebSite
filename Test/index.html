@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <title>HTML</title>
+
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                $("#submit").click(function(){
+                    fn_val=$('#fn').val(); 
+                    ln_val=$('#ln').val(); 
+                    $.ajax({
+                        type: 'POST',
+                        url: 'api.php',
+                        data : {fn: fn_val , ln: ln_val},
+                        success: function(result) {
+                            var data = $.parseJSON(result);
+                            $("#the_results").append('Associative array returned' + '<BR>');
+                            $.each(data, function(index, value) {
+                                $("#the_results").append("index =  " + index + ', data = ' + value + '<BR>');
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+        <div>
+            First name: <input type="text" name="fn" id='fn'>
+            Last Name: <input type="text" name="ln" id='ln'>
+            <button id="submit">Pass Data to PHP</button>
+        </div>
+        <div id="the_results"></div>
+    </body>
+</html>
