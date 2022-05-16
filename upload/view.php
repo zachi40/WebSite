@@ -1,5 +1,5 @@
 <?php
-	system("ls");
+	system("whoami");
     include_once 'dbconfig.php';
 ?>
 <!DOCTYPE html>
