@@ -1,4 +1,5 @@
 <?php
+	system("ls");
     include_once 'dbconfig.php';
 ?>
 <!DOCTYPE html>
