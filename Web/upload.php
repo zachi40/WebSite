@@ -1,4 +1,5 @@
 <?php
+echo "1";
 session_start();
 if (isset($_SESSION['userSession'])!="") {
 	header("Location: index.php");
