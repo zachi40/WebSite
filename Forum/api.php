@@ -1,5 +1,5 @@
 <?php
-    /* Error */
+    /* Error1 */
     function return_error($errMsg){
         header('HTTP/1.1 403 Forbidden', true, 403);
         header('Content-Type: application/json');
